@@ -5,14 +5,14 @@ class Piece
   attr_accessor :pos
   attr_reader :color, :board
 
-  def initialize(color, pos, board) # pass @type
+  def initialize(color, pos, board)
     @color = color
     @pos = pos
     @board = board
   end
 
   def to_s
-    "X".colorize(@color) # if @type == :x
+    "#{self.class.to_s[0]}".colorize(@color) # https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
   end
 
   def moves

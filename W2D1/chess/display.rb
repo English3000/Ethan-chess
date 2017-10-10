@@ -34,9 +34,9 @@ end
 if __FILE__ == $PROGRAM_NAME
   board = Board.new
   display = Display.new(board)
-  p board[[0,0]].moves
-  # 10.times do
-  #   display.render
-  #   display.cursor_pos.get_input
-  # end
+  # p board[[0,0]].moves
+  10.times do
+    display.render
+    display.cursor_pos.get_input
+  end
 end

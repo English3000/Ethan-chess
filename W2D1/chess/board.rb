@@ -14,7 +14,7 @@ class Board
 
     (6..7).each do |row|
       (0..7).each do |col|
-        self[[row, col]] = Queen.new(:white, [row, col], self)
+        self[[row, col]] = Piece.new(:white, [row, col], self)
       end
     end
 
