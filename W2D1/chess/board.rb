@@ -1,26 +1,46 @@
 require_relative "pieces"
 
 class Board
-  attr_reader :grid
+  attr_accessor :grid
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
 
-    (0..1).each do |row|
-      (0..7).each do |col|
-        self[[row, col]] = Queen.new(:black, [row, col], self)
-      end
+    generate_pieces_row = Proc.new do |color, row, board|
+      [
+        Rook.new(color, [row, 0], board),
+        Knight.new(color, [row, 1], board),
+        Bishop.new(color, [row, 2], board),
+        Queen.new(color, [row, 3], board),
+        King.new(color, [row, 4], board),
+        Bishop.new(color, [row, 5], board),
+        Knight.new(color, [row, 6], board),
+        Rook.new(color, [row, 7], board)
+      ]
     end
 
-    (6..7).each do |row|
-      (0..7).each do |col|
-        self[[row, col]] = Piece.new(:white, [row, col], self)
+    generate_pawn_row = Proc.new do |color, row, board|
+      ret_val = []
+      8.times do |col|
+        ret_val << Pawn.new(color, [row, col], board)
       end
+      ret_val
     end
 
+    [1, 6].each do |row|
+      row_color = row == 6 ? :white : :black
+      @grid[row] = generate_pawn_row.call(row_color, row, self)
+    end
+
+    [0, 7].each do |row|
+      row_color = row == 7 ? :white : :black
+      @grid[row] = generate_pieces_row.call(row_color, row, self)
+    end
+
+    # (1..6).each do |row|
     (2..5).each do |row|
       (0..7).each do |col|
-        self[[row, col]] = NullPiece.new
+        self[[row, col]] = NullPiece.instance
       end
     end
   end
@@ -30,9 +50,54 @@ class Board
   end
 
   def move_piece(start_pos, end_pos)
-    raise ArgumentError if self[start_pos] == nil #.class == NullPiece
-    # raise ArgumentError if wrong end_pos
-    self[end_pos], self[start_pos] = self[start_pos], self[end_pos]
+    if self[start_pos].valid_move?(start_pos, end_pos)
+      self[end_pos], self[start_pos] = self[start_pos], self[end_pos]
+    else
+      raise ArgumentError, "Invalid move."
+      #retry
+    end
+  end
+
+  def board_dup
+    dup_board = self.dup # equiv. of Piece#valid_moves
+    dup_board.grid = self.grid.deeper_dup #dup'd piece ref's (to the orig. board)?
+    dup_board.update_refs
+    dup_board
+  end
+
+  def update_refs
+    self.grid.each_index do |row_i|
+      self.grid[row_i].each do |piece|
+        piece.board = self
+      end
+    end
+  end
+
+  # def valid_move?(start_pos, end_pos)
+  #   dup_board = self.board_dup
+  #   dup_board[end_pos], dup_board[start_pos] = dup_board[start_pos], dup_board[end_pos]
+  #   if self[start_pos].class == NullPiece
+  #     raise ArgumentError, "No piece to move."
+  #   # raise ArgumentError, "Can't move there." unless self[start_pos].moves.include?(end_pos)
+  #   elsif dup_board.in_check?(dup_board[end_pos].color)
+  #     raise ArgumentError, "Can't move into check!"
+  #   end
+  # end
+
+  def in_check?(color)
+    @grid.each_index do |row_i|
+      @grid[row_i].each do |piece|
+        next if piece.class == NullPiece || piece.color == color
+        return true if piece.moves.any? do |pos|
+          self[pos].class == King && self[pos].color == color
+        end
+      end
+    end
+    false
+  end
+
+  def checkmate?(color)
+    #all_pieces.valid_moves.empty?
   end
 
   def [](pos)
@@ -43,4 +108,23 @@ class Board
     @grid[pos[0]][pos[1]] = value
   end
 
+end
+
+
+class Array
+  def deeper_dup
+    ret_val = []
+    self.each do |el|
+      if el.is_a? Array
+        ret_val << el.deeper_dup
+      else
+        if el.is_a? NullPiece
+          ret_val << el
+        else
+          ret_val << el.dup
+        end
+      end
+    end
+    ret_val
+  end
 end

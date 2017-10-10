@@ -32,11 +32,17 @@ class Display
 end
 
 if __FILE__ == $PROGRAM_NAME
+begin
   board = Board.new
   display = Display.new(board)
-  # p board[[0,0]].moves
-  10.times do
-    display.render
-    display.cursor_pos.get_input
-  end
+  board.move_piece([0, 4], [1, 3])
+# rescue
+  display.render
+  # p board[[0,1]].moves
+  # p board[[0,4]].moves
+  # 10.times do
+  #   display.render
+  #   display.cursor_pos.get_input
+  # end
+end
 end
