@@ -99,7 +99,7 @@ class Cursor
     new_pos = []
     (0..1).each {|idx| new_pos[idx] = diff[idx] + @cursor_pos[idx]}
     if Board.in_bounds?(new_pos)
-      @cursor_pos = new_pos#.on_red
+      @cursor_pos = new_pos
     end
   end
 end

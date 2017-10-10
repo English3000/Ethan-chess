@@ -1,4 +1,5 @@
 require_relative 'board'
+require "byebug"
 
 class Piece
   attr_accessor :pos
@@ -22,6 +23,7 @@ end
 
 class NullPiece < Piece
   # include Singleton
+  attr_reader :color
 
   def initialize
     @color = :light_black
@@ -59,17 +61,21 @@ module SlidingPiece
     all_moves = []
     row, col = self.pos
     change_by.each do |change|
-      test_spot = [row + change[0], col + change[1]]
-      while Board.in_bounds?(test_spot)
-        if self.board[test_spot].class == NullPiece
-          all_moves << test_spot
-          test_spot[0] += change[0]
-          test_spot[1] += change[1]
-        elsif self.board[test_spot].color != @color
-          all_moves << test_spot
-          test_spot[0] = 9
-          test_spot[1] = 9
-          #checks w/ next change
+      test_spot = [row, col]
+      in_bounds = true
+      while in_bounds
+        test_spot = [test_spot[0] + change[0], test_spot[1] + change[1]]
+        if Board.in_bounds?(test_spot)
+          if self.board[test_spot].class == NullPiece
+            all_moves << test_spot
+          elsif self.board[test_spot].color != @color
+            all_moves << test_spot
+            break
+          else
+            break
+          end
+        else
+          in_bounds = false
         end
       end
     end
