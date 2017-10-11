@@ -43,14 +43,6 @@ class Board
         self[[row, col]] = NullPiece.instance
       end
     end
-
-    #test!
-    # [0, 7].each do |row|
-    #   (0..7).each do |col|
-    #     self[[row, col]] = NullPiece.instance
-    #   end
-    # end
-
   end
 
   def self.in_bounds?(pos)
@@ -63,9 +55,8 @@ class Board
       self[end_pos].pos = end_pos
       # self.convert if self.is_a?(Pawn)
     else
-      # puts "Invalid move."
+      puts "Invalid move."
       raise ArgumentError, "Invalid move."
-      # retry
     end
   end
 

@@ -151,9 +151,9 @@ module SteppingPiece
       test_spot = [self.pos[0] + change[0], self.pos[1] + change[1]]
       if Board.in_bounds?(test_spot)
         if self.board[test_spot].class == NullPiece
-          all_moves << test_spot #if self.board.valid_move?(self.pos, test_spot)
+          all_moves << test_spot
         elsif self.board[test_spot].color != @color
-          all_moves << test_spot #if self.board.valid_move?(self.pos, test_spot)
+          all_moves << test_spot
         end
       end
     end
