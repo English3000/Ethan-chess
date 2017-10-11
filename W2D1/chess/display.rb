@@ -35,11 +35,13 @@ if __FILE__ == $PROGRAM_NAME
 begin
   board = Board.new
   display = Display.new(board)
-  board.move_piece([0, 4], [1, 3])
+  board.move_piece([6, 0], [4, 0])
+  # board.move_piece([1, 0], [2, 0])
 # rescue
   display.render
-  # p board[[0,1]].moves
-  # p board[[0,4]].moves
+  # puts board.checkmate?(:white)
+  p board[[4,0]].moves
+  p board[[4,0]].pos
   # 10.times do
   #   display.render
   #   display.cursor_pos.get_input

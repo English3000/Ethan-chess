@@ -13,10 +13,9 @@ class Piece
       knight: [
         [-1, -2], [-1, 2], [-2, -1], [-2, 1],
         [1, -2], [1, 2], [2, -1], [2, 1]
-      ]#,
-      # pawn: [[0, 1], [0, -1]]
-        #[0, 2], [0, -2] on first move
-        #[1,1], [1, -1]; [-1, -1], [-1, 1] to take piece
+      ],
+      black_pawn: [[2, 0], [1, -1], [1, 1], [1, 0]],
+      white_pawn: [[-2, 0], [-1, -1], [-1, 1], [-1, 0]]
     }
 
     @color = color
@@ -29,23 +28,31 @@ class Piece
     self.type.colorize(@color)
   end
 
-  def valid_moves(all_moves)
+  def valid_moves(all_moves) #all_moves = piece.moves
     all_moves.select{|move| valid_move?(self.pos, move)}
   end
 
   def valid_move?(start_pos, end_pos)
-    false if self.is_a? NullPiece
+    return false if self.is_a?(NullPiece) ||
+      self.color == self.board[end_pos].color ||
+      !Board.in_bounds?(end_pos)
     dup_board = self.board.board_dup
     dup_board[end_pos], dup_board[start_pos] = dup_board[start_pos], dup_board[end_pos]
     !dup_board.in_check?(self.color)
+  end
+
+  def moves
+    []
   end
 end
 
 
 class NullPiece < Piece
   include Singleton
+  # attr_reader :color
 
   def initialize
+    @color = :no_color
   end
 
   def to_s
@@ -54,11 +61,6 @@ class NullPiece < Piece
 end
 
 
-# Classes that include SlidingPiece in particular need the Board
-# so they know to stop sliding when blocked by another piece.
-#
-# Don't allow a piece to move into a square already occupied by the same color piece,
-# or to move a sliding piece past a piece that blocks it.
 module SlidingPiece
   def moves
     case self.mobility
@@ -191,13 +193,55 @@ class Pawn < Piece
     super
   end
 
-  def moves
-    []
+  def convert
+    if self.pos[0] == 0 || self.pos[0] = 7
+      self.board[@pos] = Queen.new(self.color, @pos, @board)
+    end
   end
 
-  def moves_arr
-    # pawn: [[0, 1], [0, -1]]
-      #[0, 2], [0, -2] on first move
-      #[1,1], [1, -1]; [-1, -1], [-1, 1] to take piece
+  def moves
+    case @color
+    when :black
+      moves_arr(self.moves_dir[:black_pawn])
+    when :white
+      moves_arr(self.moves_dir[:white_pawn])
+    end
+  end
+
+  def moves_arr(change_by)
+    all_moves = []
+    row, col = self.pos
+
+    #if first move
+    if (row == 1 && self.color == :black) ||
+    (row == 6 && self.color == :white)
+      changed_row = self.pos[0] + change_by[0][0]
+      changed_col = self.pos[1] + change_by[0][1]
+      test_spot = [changed_row, changed_col]
+      if Board.in_bounds?(test_spot) &&
+      self.board[test_spot].class == NullPiece
+        all_moves << test_spot
+      end
+    end
+
+    #if enemy piece
+    change_by[1..2].each do |change|
+      test_spot = [self.pos[0] + change[0], self.pos[1] + change[1]]
+      next unless Board.in_bounds?(test_spot)
+      if self.board[test_spot].color != self.color &&
+      self.board[test_spot].class != NullPiece
+        all_moves << test_spot
+      end
+    end
+
+    #else
+    changed_row = self.pos[0] + change_by[3][0]
+    changed_col = self.pos[1] + change_by[3][1]
+    test_spot = [changed_row, changed_col]
+    if Board.in_bounds?(test_spot) &&
+    self.board[test_spot].class == NullPiece
+      all_moves << test_spot
+    end
+    all_moves
   end
 end

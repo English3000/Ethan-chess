@@ -1,4 +1,5 @@
 require_relative "pieces"
+require "byebug"
 
 class Board
   attr_accessor :grid
@@ -37,12 +38,19 @@ class Board
       @grid[row] = generate_pieces_row.call(row_color, row, self)
     end
 
-    # (1..6).each do |row|
     (2..5).each do |row|
       (0..7).each do |col|
         self[[row, col]] = NullPiece.instance
       end
     end
+
+    #test!
+    # [0, 7].each do |row|
+    #   (0..7).each do |col|
+    #     self[[row, col]] = NullPiece.instance
+    #   end
+    # end
+
   end
 
   def self.in_bounds?(pos)
@@ -52,14 +60,17 @@ class Board
   def move_piece(start_pos, end_pos)
     if self[start_pos].valid_move?(start_pos, end_pos)
       self[end_pos], self[start_pos] = self[start_pos], self[end_pos]
+      self[end_pos].pos = end_pos
+      # self.convert if self.is_a?(Pawn)
     else
+      # puts "Invalid move."
       raise ArgumentError, "Invalid move."
-      #retry
+      # retry
     end
   end
 
   def board_dup
-    dup_board = self.dup # equiv. of Piece#valid_moves
+    dup_board = self.dup
     dup_board.grid = self.grid.deeper_dup #dup'd piece ref's (to the orig. board)?
     dup_board.update_refs
     dup_board
@@ -72,17 +83,6 @@ class Board
       end
     end
   end
-
-  # def valid_move?(start_pos, end_pos)
-  #   dup_board = self.board_dup
-  #   dup_board[end_pos], dup_board[start_pos] = dup_board[start_pos], dup_board[end_pos]
-  #   if self[start_pos].class == NullPiece
-  #     raise ArgumentError, "No piece to move."
-  #   # raise ArgumentError, "Can't move there." unless self[start_pos].moves.include?(end_pos)
-  #   elsif dup_board.in_check?(dup_board[end_pos].color)
-  #     raise ArgumentError, "Can't move into check!"
-  #   end
-  # end
 
   def in_check?(color)
     @grid.each_index do |row_i|
@@ -97,7 +97,13 @@ class Board
   end
 
   def checkmate?(color)
-    #all_pieces.valid_moves.empty?
+    @grid.each_index do |row_i|
+      @grid[row_i].each do |piece|
+        next if piece.class == NullPiece || piece.color != color
+        return false unless piece.valid_moves(piece.moves).empty?
+      end
+    end
+    true
   end
 
   def [](pos)
@@ -115,10 +121,10 @@ class Array
   def deeper_dup
     ret_val = []
     self.each do |el|
-      if el.is_a? Array
+      if el.is_a?(Array)
         ret_val << el.deeper_dup
       else
-        if el.is_a? NullPiece
+        if el.is_a?(NullPiece)
           ret_val << el
         else
           ret_val << el.dup
