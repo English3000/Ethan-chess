@@ -36,6 +36,7 @@ class Piece
     return false if self.is_a?(NullPiece) ||
       self.color == self.board[end_pos].color ||
       !Board.in_bounds?(end_pos)
+
     dup_board = self.board.board_dup
     dup_board[end_pos], dup_board[start_pos] = dup_board[start_pos], dup_board[end_pos]
     !dup_board.in_check?(self.color)
@@ -49,7 +50,7 @@ end
 
 class NullPiece < Piece
   include Singleton
-  # attr_reader :color
+  attr_reader :color
 
   def initialize
     @color = :no_color

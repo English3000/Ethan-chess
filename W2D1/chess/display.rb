@@ -7,7 +7,7 @@ class Display
 
   def initialize(board)
     @board = board
-    @cursor = Cursor.new([0,0], board)
+    @cursor = Cursor.new([6,4], board)
     @board[@cursor.cursor_pos]
   end
 
@@ -30,21 +30,3 @@ class Display
   end
 
 end
-
-# if __FILE__ == $PROGRAM_NAME
-# begin
-#   board = Board.new
-#   display = Display.new(board)
-#   board.move_piece([6, 0], [4, 0])
-#   # board.move_piece([1, 0], [2, 0])
-# # rescue
-#   display.render
-#   # puts board.checkmate?(:white)
-#   p board[[4,0]].moves
-#   p board[[4,0]].pos
-#   # 10.times do
-#   #   display.render
-#   #   display.cursor.get_input
-#   # end
-# end
-# end

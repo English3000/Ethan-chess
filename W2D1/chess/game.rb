@@ -1,6 +1,7 @@
 require_relative 'board'
 require_relative 'display'
 require_relative 'player'
+require "byebug"
 
 class Game
   attr_reader :chessboard, :display, :player1, :player2, :current_player
@@ -13,17 +14,31 @@ class Game
     @current_player = player2
   end
 
+  def start_game
+    print "Enter name for white side: "
+    @player1.name = gets.chomp
+
+    print "Enter name for black side: "
+    @player2.name = gets.chomp
+
+  end
+
   def play
-    until chessboard.checkmate?(current_player.color) # add logic for draw
-      current_player = current_player == player1 ? player2 : player1
+    start_game
+    current_player = player2
+    other_player = player1
+    until chessboard.checkmate?(other_player.color)
+      current_player, other_player = other_player, current_player
       begin
-        move = current_player.play_turn(@chessboard, @display, @current_player)
-        chessboard.move_piece(move.first, move.last)
+        move = current_player.play_turn(@display)
+        # debugger
+        chessboard.move_piece(move.first, move.last, current_player.color)
       rescue
         retry
       end
     end
-    puts "#{current_player.name}, you win :)"
+    @display.render
+    puts "Checkmate. #{current_player.name} wins!"
   end
 end
 

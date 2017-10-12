@@ -49,9 +49,14 @@ class Board
     pos.all?{|el| el.between?(0,7)}
   end
 
-  def move_piece(start_pos, end_pos)
-    if self[start_pos].valid_move?(start_pos, end_pos)
-      self[end_pos], self[start_pos] = self[start_pos], self[end_pos]
+  def move_piece(start_pos, end_pos, current_player_color)
+
+    if self[start_pos].color != current_player_color
+      raise ArgumentError, "Can't grab other color"
+    end
+
+    if self[start_pos].valid_moves(self[start_pos].moves).include?(end_pos)
+      self[end_pos], self[start_pos] = self[start_pos], NullPiece.instance
       self[end_pos].pos = end_pos
       # self.convert if self.is_a?(Pawn)
     else

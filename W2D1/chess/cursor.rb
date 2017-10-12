@@ -101,5 +101,6 @@ class Cursor
     if Board.in_bounds?(new_pos)
       @cursor_pos = new_pos
     end
+    nil
   end
 end
