@@ -49,6 +49,16 @@ class Board
     pos.all?{|el| el.between?(0,7)}
   end
 
+  def spots_with_color(color)
+    spots = []
+    @grid.each_with_index do |row, row_idx|
+      row.each_with_index do |el, col_idx|
+        spots << [row_idx, col_idx] if el.color == color
+      end
+    end
+    spots
+  end
+
   def move_piece(start_pos, end_pos, current_player_color)
 
     if self[start_pos].color != current_player_color

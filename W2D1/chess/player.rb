@@ -12,34 +12,20 @@ class HumanPlayer
   end
 
   def play_turn(display)
-    # display.render
-    # puts "To select a piece, move the cursor to it
-    # & hit the spacebar or enter."
-    # input = [0, 0]
-    # output = @cursor.get_input
-    # until input == output #&& board[input].color == current_player.color
-    #   display.render
-    #   puts "To select a piece, move the cursor to it
-    #   & hit the spacebar or enter."
-    #   input = output
-    #   output = @cursor.get_input
-    # end
-    # start_pos = input
-    #
-    # puts "You've selected #{@cursor.board[input].class} at #{input}."
-    # puts "Where would you like to move it?"
-    #
-    # output = @cursor.get_input
-    # until input == output
-    #   display.render
-    #   puts "Select a place to move it."
-    #   input = output
-    #   output = @cursor.get_input
-    # end
+    #find my pieces
+    my_color_spots = display.board.spots_with_color(@color)
+    display.set_blue(my_color_spots) #turn them blue if cursor on them
 
-
+    # get piece to grab
     start_pos = get_pos(display, "Select piece to grab")
+
+    # start over if wrong color
+    play_turn if display.board[start_pos].color != @color
+    display.set_blue(nil) #reset blue spots to empty
+
+    display.set_grabbed(start_pos) #set valid move locations to green
     end_pos = get_pos(display, "Select place to drop piece")
+    display.set_grabbed(nil)
     [start_pos, end_pos]
   end
 

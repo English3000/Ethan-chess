@@ -30,8 +30,8 @@ class Game
     until chessboard.checkmate?(other_player.color)
       current_player, other_player = other_player, current_player
       begin
-        move = current_player.play_turn(@display)
         # debugger
+        move = current_player.play_turn(@display)
         chessboard.move_piece(move.first, move.last, current_player.color)
       rescue
         retry
